@@ -30,6 +30,19 @@ public class JedCoreConfig {
 		config.addDefault("Settings.Toggle.Off", "&7You have hidden the bending board.");
 		config.addDefault("Settings.Toggle.On", "&7You have toggled the bending board on.");
 		config.addDefault("Settings.Display.DisabledWorlds", true);
+
+		config.addDefault("Settings.OtherCooldowns.WallRun.Color", "GOLD");
+		config.addDefault("Settings.OtherCooldowns.WallRun.Enabled", true);
+		config.addDefault("Settings.OtherCooldowns.TorrentWave.Color", "AQUA");
+		config.addDefault("Settings.OtherCooldowns.TorrentWave.Enabled", true);
+		config.addDefault("Settings.OtherCooldowns.SurgeWave.Color", "AQUA");
+		config.addDefault("Settings.OtherCooldowns.SurgeWave.Enabled", true);
+		config.addDefault("Settings.OtherCooldowns.SurgeWall.Color", "AQUA");
+		config.addDefault("Settings.OtherCooldowns.SurgeWall.Enabled", true);
+		config.addDefault("Settings.OtherCooldowns.RaiseEarthPillar.Color", "GREEN");
+		config.addDefault("Settings.OtherCooldowns.RaiseEarthPillar.Enabled", true);
+		config.addDefault("Settings.OtherCooldowns.RaiseEarthWall.Color", "GREEN");
+		config.addDefault("Settings.OtherCooldowns.RaiseEarthWall.Enabled", true);
 		
 		config.options().copyDefaults(true);
 		board.saveConfig();
@@ -42,7 +55,8 @@ public class JedCoreConfig {
 		config.addDefault("Settings.Updater.Check", true);
 		config.addDefault("Settings.Updater.Notify", true);
 		config.addDefault("Properties.MobCollisions.Enabled", true);
-		config.addDefault("Properties.AbilityCollisions.Enabled", false);
+		config.addDefault("Properties.AbilityCollisions.Enabled", true);
+		config.addDefault("Properties.FireTickMethod", "larger");
 		
 		config.addDefault("Abilities.Avatar.ElementSphere.Enabled", true);
 		config.addDefault("Abilities.Avatar.ElementSphere.Description", "ElementSphere is a very all round ability, being "
@@ -445,8 +459,14 @@ public class JedCoreConfig {
 		config.addDefault("Abilities.Fire.FireBall.Damage", 3.0);
 		config.addDefault("Abilities.Fire.FireBall.FireDuration", 2000);
 		config.addDefault("Abilities.Fire.FireBall.Controllable", false);
-		config.addDefault("Abilities.Fire.FireBall.ShieldCollisions", true);
 		config.addDefault("Abilities.Fire.FireBall.FireTrail", true);
+		config.addDefault("Abilities.Fire.FireBall.Collisions.FireShield.Enabled", true);
+		config.addDefault("Abilities.Fire.FireBall.Collisions.FireShield.RemoveFirst", true);
+		config.addDefault("Abilities.Fire.FireBall.Collisions.FireShield.RemoveSecond", false);
+		config.addDefault("Abilities.Fire.FireBall.Collisions.AirShield.Enabled", true);
+		config.addDefault("Abilities.Fire.FireBall.Collisions.AirShield.RemoveFirst", false);
+		config.addDefault("Abilities.Fire.FireBall.Collisions.AirShield.RemoveSecond", false);
+		config.addDefault("Abilities.Fire.FireBall.Collisions.AirShield.Reflect", true);
 		
 		config.addDefault("Abilities.Fire.FireBreath.Enabled", true);
 		config.addDefault("Abilities.Fire.FireBreath.Description", "To use, hold Sneak (Default: Shift) to start breathing "
@@ -504,7 +524,13 @@ public class JedCoreConfig {
 		config.addDefault("Abilities.Fire.FireShots.FireBalls", 4);
 		config.addDefault("Abilities.Fire.FireShots.FireDuration", 3000);
 		config.addDefault("Abilities.Fire.FireShots.Damage", 2.0);
-		config.addDefault("Abilities.Fire.FireShots.ShieldCollisions", true);
+		config.addDefault("Abilities.Fire.FireShots.Collisions.FireShield.Enabled", true);
+		config.addDefault("Abilities.Fire.FireShots.Collisions.FireShield.RemoveFirst", true);
+		config.addDefault("Abilities.Fire.FireShots.Collisions.FireShield.RemoveSecond", false);
+		config.addDefault("Abilities.Fire.FireShots.Collisions.AirShield.Enabled", true);
+		config.addDefault("Abilities.Fire.FireShots.Collisions.AirShield.RemoveFirst", false);
+		config.addDefault("Abilities.Fire.FireShots.Collisions.AirShield.RemoveSecond", false);
+		config.addDefault("Abilities.Fire.FireShots.Collisions.AirShield.Reflect", true);
 		
 		config.addDefault("Abilities.Fire.FireSki.Enabled", true);
 		config.addDefault("Abilities.Fire.FireSki.Cooldown", 6000);
@@ -715,6 +741,7 @@ public class JedCoreConfig {
 				+ "inflicting a lot of damage! This ability has a long cooldown. You must hit the target in the back or this ability won't work!");
 		config.addDefault("Abilities.Chi.Backstab.Cooldown", 8500);
 		config.addDefault("Abilities.Chi.Backstab.Damage", 6.0);
+		config.addDefault("Abilities.Chi.Backstab.MaxActivationAngle", 90);
 		
 		config.addDefault("Abilities.Chi.DaggerThrow.Enabled", true);
 		config.addDefault("Abilities.Chi.DaggerThrow.Description", "With this ability bound, Left-Click in "

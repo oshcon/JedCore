@@ -54,10 +54,13 @@ public class JedCore extends JavaPlugin {
 		BendingBoard.updateOnline();
 		new Commands();
 
+		FireTick.loadMethod();
+
 		new BukkitRunnable() {
 			@Override
 			public void run() {
 				JCMethods.registerCombos();
+				BendingBoard.loadOtherCooldowns();
 				initializeCollisions();
 			}
 		}.runTaskLater(this, 1);
