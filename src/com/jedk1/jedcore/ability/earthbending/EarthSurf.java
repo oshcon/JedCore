@@ -1,6 +1,7 @@
 package com.jedk1.jedcore.ability.earthbending;
 
 import com.jedk1.jedcore.JedCore;
+import com.jedk1.jedcore.util.MaterialUtil;
 import com.jedk1.jedcore.util.RegenTempBlock;
 import com.jedk1.jedcore.util.TempFallingBlock;
 import com.projectkorra.projectkorra.GeneralMethods;
@@ -18,26 +19,27 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import java.util.Random;
+import java.util.*;
 
 public class EarthSurf extends EarthAbility implements AddonAbility {
+	private static final double TARGET_HEIGHT = 1.5;
 
 	private Location location;
 	private double initHealth;
-	private long time;
-	Random rand = new Random();
-
-	private boolean couldFly = false, wasFlying = false;
 
 	//Player Positioning
 	private double distOffset = 2.5;
-	private double heightOffset = 1.5;
 
 	private long cooldown;
+	private long minimumCooldown;
 	private long duration;
 	private boolean cooldownEnabled;
 	private boolean durationEnabled;
 	private double speed;
+	private double springStiffness;
+	private Set<Block> ridingBlocks = new HashSet<>();
+	private CollisionDetector collisionDetector = new DefaultCollisionDetector();
+	private DoubleSmoother heightSmoother;
 
 	public EarthSurf(Player player) {
 		super(player);
@@ -47,124 +49,131 @@ public class EarthSurf extends EarthAbility implements AddonAbility {
 		}
 
 		if (hasAbility(player, EarthSurf.class)) {
-			((EarthSurf) getAbility(player, EarthSurf.class)).remove();
+			getAbility(player, EarthSurf.class).remove();
 			return;
 		}
+
 		setFields();
-		time = System.currentTimeMillis();
+
 		location = player.getLocation();
-		if (isEarthbendable(player, getBlockBeneath(player.getLocation().clone())) && !isMetal(getBlockBeneath(player.getLocation().clone()))) {
+
+		if (canStart()) {
 			initHealth = player.getHealth();
-			couldFly = player.getAllowFlight();
-			wasFlying = player.isFlying();
+			player.setAllowFlight(true);
+			player.setFlying(false);
 			start();
 		}
 	}
 
+	private boolean canStart() {
+		Block beneath = getBlockBeneath(player.getLocation().clone());
+		double maxHeight = getMaxHeight();
+
+		return isEarthbendable(player, beneath) && !isMetal(beneath) && beneath.getLocation().distanceSquared(player.getLocation()) <= maxHeight * maxHeight;
+	}
+
 	public void setFields() {
 		cooldown = JedCore.plugin.getConfig().getLong("Abilities.Earth.EarthSurf.Cooldown.Cooldown");
+		minimumCooldown = JedCore.plugin.getConfig().getLong("Abilities.Earth.EarthSurf.Cooldown.MinimumCooldown");
 		duration = JedCore.plugin.getConfig().getLong("Abilities.Earth.EarthSurf.Duration.Duration");
 		cooldownEnabled = JedCore.plugin.getConfig().getBoolean("Abilities.Earth.EarthSurf.Cooldown.Enabled");
 		durationEnabled = JedCore.plugin.getConfig().getBoolean("Abilities.Earth.EarthSurf.Duration.Enabled");
 		speed = JedCore.plugin.getConfig().getDouble("Abilities.Earth.EarthSurf.Speed");
+		springStiffness = JedCore.plugin.getConfig().getDouble("Abilities.Earth.EarthSurf.SpringStiffness");
+
+		int smootherSize = JedCore.plugin.getConfig().getInt("Abilities.Earth.EarthSurf.HeightTolerance");
+		this.heightSmoother = new DoubleSmoother(Math.max(smootherSize, 1));
+
+		if (JedCore.plugin.getConfig().getBoolean("Abilities.Earth.EarthSurf.RelaxedCollisions")) {
+			this.collisionDetector = new RelaxedCollisionDetector();
+		}
+
+		if (!JedCore.plugin.getConfig().getBoolean("Abilities.Earth.EarthSurf.Cooldown.Scaled")) {
+			minimumCooldown = cooldown;
+		}
 	}
 
 	@Override
 	public void progress() {
-		if (player == null || player.isDead() || !player.isOnline()) {
+		if (shouldRemove()) {
 			remove();
 			return;
 		}
-		if (!bPlayer.canBendIgnoreCooldowns(this)) {
-			remove();
-			return;
-		}
-		if (!isEarthbendable(player, getBlockBeneath(player.getLocation().clone()))) {
-			remove();
-			return;
-		}
-		if (durationEnabled && System.currentTimeMillis() > time + duration) {
-			remove();
-			return;
-		}
-		if (!collision() && player.getHealth() >= initHealth) {
+
+		this.player.setFlying(false);
+
+		if (!collisionDetector.isColliding(player) && player.getHealth() >= initHealth) {
 			movePlayer();
 		} else {
 			remove();
-			return;
-		}
-
-		if (player.isSneaking()) {
-			remove();
-			return;
 		}
 	}
-	
-	private void allowFlight() {
-		player.setAllowFlight(true);
-		player.setFlying(true);
+
+	private boolean shouldRemove() {
+		if (player == null || player.isDead() || !player.isOnline()) return true;
+		if (!bPlayer.canBendIgnoreCooldowns(this)) return true;
+		if (!isEarthbendable(player, getBlockBeneath(player.getLocation().clone()))) return true;
+		if (durationEnabled && System.currentTimeMillis() > getStartTime() + duration) return true;
+
+		return player.isSneaking();
 	}
 
-	private void removeFlight() {
-		player.setAllowFlight(false);
-		player.setFlying(false);
-	}
-	
 	private void movePlayer() {
-
-		location = player.getEyeLocation();
+		location = player.getEyeLocation().clone();
 		location.setPitch(0);
-		Vector dV = location.getDirection().normalize();
-		Vector travel = new Vector();
+		Vector direction = location.getDirection().normalize();
 
-		if (getPlayerDistance() > heightOffset + 2) {
+		// How far the player is above the ground.
+		double height = getPlayerDistance();
+		double maxHeight = getMaxHeight();
+		double smoothedHeight = heightSmoother.add(height);
+
+		// Destroy ability if player gets too far from ground.
+		if (smoothedHeight > maxHeight) {
 			remove();
 			return;
-		} else if (getPlayerDistance() > heightOffset + 1) {
-			removeFlight();
-			travel = new Vector(dV.getX() * speed, -0.11, dV.getZ() * speed);
-		} else if (getPlayerDistance() > heightOffset + 0.8) {
-			travel = new Vector(dV.getX() * speed, -0.09, dV.getZ() * speed);
-		} else if (getPlayerDistance() < heightOffset + 0.7) {
-			allowFlight();
-			travel = new Vector(dV.getX() * speed, 0.11, dV.getZ() * speed);
-		} else {
-			travel = new Vector(dV.getX() * speed, 0, dV.getZ() * speed);
 		}
+
+		// Calculate the spring force to push the player back to the target height.
+		double displacement = height - TARGET_HEIGHT;
+		double force = -springStiffness * displacement;
+
+		double maxForce = 0.5;
+		if (Math.abs(force) > maxForce) {
+			// Cap the force to maxForce so the player isn't instantly pulled to the ground.
+			force = force / Math.abs(force) * maxForce;
+		}
+
+		Vector velocity = direction.clone().multiply(speed).setY(force);
 
 		rideWave();
-		player.setVelocity(travel);
+
+		player.setVelocity(velocity);
 		player.setFallDistance(0);
+	}
+
+	private double getMaxHeight() {
+		return TARGET_HEIGHT + 2.0;
 	}
 
 	private double getPlayerDistance() {
 		Location l = player.getLocation().clone();
-		while (l.getBlock() != null && l.getBlockY() > 1 && !GeneralMethods.isSolid(l.getBlock())) {
+		while (true) {
+			if (l.getBlock() == null) break;
+			if (l.getBlockY() <= 1) break;
+			if (l.getBlock().getType() == Material.AIR && ridingBlocks.contains(l.getBlock())) break;
+			if (GeneralMethods.isSolid(l.getBlock())) break;
+
 			l.add(0, -0.1, 0);
 		}
 		return player.getLocation().getY() - l.getY();
 	}
 
 	private Block getBlockBeneath(Location l) {
-		while (l.getBlock() != null && l.getBlockY() > 1 && isTransparent(l.getBlock())) {
+		while (l.getBlock() != null && l.getBlockY() > 1 && MaterialUtil.isTransparent(l.getBlock())) {
 			l.add(0, -0.5, 0);
 		}
 		return l.getBlock();
-	}
-
-	private boolean collision() {
-		Location l = player.getEyeLocation();
-		l.setPitch(0);
-		Vector dV = l.getDirection().normalize();
-		l.add(new Vector(dV.getX() * 0.8, 0, dV.getZ() * 0.8));
-
-		if (!isTransparent(l.getBlock()) || l.getBlock().isLiquid() || l.getBlock().getType().isSolid())
-			return true;
-		if (!isTransparent(l.clone().add(0, -1, 0).getBlock()) || l.clone().add(0, -1, 0).getBlock().isLiquid() || l.clone().add(0, -1, 0).getBlock().getType().isSolid())
-			return true;
-		if (!isTransparent(l.clone().add(0, -2, 0).getBlock()) || l.clone().add(0, -2, 0).getBlock().isLiquid() || l.clone().add(0, -2, 0).getBlock().getType().isSolid())
-			return true;
-		return false;
 	}
 
 	@SuppressWarnings("deprecation")
@@ -178,6 +187,7 @@ public class EarthSurf extends EarthAbility implements AddonAbility {
 			while (loc.clone().add(0, -2.9, 0).toVector().add(location.clone().getDirection().multiply(distOffset)).toLocation(player.getWorld()).getBlock().getType() != Material.AIR) {
 				loc.add(0, 0.1, 0);
 			}
+
 			if (isEarthbendable(player, getBlockBeneath(loc.clone().add(0, -2.9, 0).toVector().add(location.clone().getDirection().multiply(distOffset)).toLocation(player.getWorld()))) && getBlockBeneath(bL) != null) {
 				Block block = loc.clone().add(0, -3.9, 0).toVector().add(location.clone().getDirection().multiply(distOffset - 0.5)).toLocation(player.getWorld()).getBlock();
 				Location temp = loc.clone().add(0, -2.9, 0).toVector().add(location.clone().getDirection().multiply(distOffset)).toLocation(player.getWorld());
@@ -190,11 +200,18 @@ public class EarthSurf extends EarthAbility implements AddonAbility {
 					if (EarthPassive.isPassiveSand(block.getRelative(BlockFace.UP))) {
 						EarthPassive.revertSand(block.getRelative(BlockFace.UP));
 					}
+
 					new TempBlock(block.getRelative(BlockFace.UP), Material.AIR, (byte) 0);
 				}
-				
-				new RegenTempBlock(block, Material.AIR, (byte) 0, 1000L);
-				new TempFallingBlock(temp, getBlockBeneath(bL).getType(), getBlockBeneath(bL).getData(), new Vector(0, 0.25, 0), this);
+
+				if (GeneralMethods.isSolid(block)) {
+					ridingBlocks.add(block);
+					new RegenTempBlock(block, Material.AIR, (byte) 0, 1000L, true, b -> ridingBlocks.remove(b));
+				} else {
+					new RegenTempBlock(block, Material.AIR, (byte) 0, 1000L);
+				}
+
+				new TempFallingBlock(temp, getBlockBeneath(bL).getType(), getBlockBeneath(bL).getData(), new Vector(0, 0.25, 0), this, true);
 				
 				for (Entity e : GeneralMethods.getEntitiesAroundPoint(loc.clone().add(0, -2.9, 0).toVector().add(location.clone().getDirection().multiply(distOffset)).toLocation(player.getWorld()), 1.5D)) {
 					if (e instanceof LivingEntity && e.getEntityId() != player.getEntityId()) {
@@ -223,14 +240,18 @@ public class EarthSurf extends EarthAbility implements AddonAbility {
 	public void remove() {
 		player.setAllowFlight(false);
 		player.setFlying(false);
-		if (couldFly) {
-			player.setAllowFlight(couldFly);
-			player.setFlying(wasFlying);
-		}
 
 		if (cooldownEnabled && player.isOnline()) {
-			bPlayer.addCooldown(this);
+			long scaledCooldown = cooldown;
+
+			if (durationEnabled && duration > 0) {
+				double t = Math.min((System.currentTimeMillis() - this.getStartTime()) / (double) duration, 1.0);
+				scaledCooldown = Math.max((long) (cooldown * t), minimumCooldown);
+			}
+
+			bPlayer.addCooldown(this, scaledCooldown);
 		}
+
 		super.remove();
 	}
 	
@@ -287,5 +308,78 @@ public class EarthSurf extends EarthAbility implements AddonAbility {
 	@Override
 	public boolean isEnabled() {
 		return JedCore.plugin.getConfig().getBoolean("Abilities.Earth.EarthSurf.Enabled");
+	}
+
+	private interface CollisionDetector {
+		boolean isColliding(Player player);
+	}
+
+	private abstract class AbstractCollisionDetector implements CollisionDetector {
+		protected boolean isCollision(Location location) {
+			Block block = location.getBlock();
+			return !MaterialUtil.isTransparent(block) || block.isLiquid() || block.getType().isSolid();
+		}
+	}
+
+	private class DefaultCollisionDetector extends AbstractCollisionDetector {
+		@Override
+		public boolean isColliding(Player player) {
+			// The location in front of the player, where the player will be in one second.
+			Location front = player.getEyeLocation().clone();
+			front.setPitch(0);
+
+			Vector direction = front.getDirection().clone().setY(0).normalize();
+			double playerSpeed = player.getVelocity().clone().setY(0).length();
+
+			front.add(direction.clone().multiply(Math.max(speed, playerSpeed)));
+
+			for (int i = 0; i < 3; ++i) {
+				Location location = front.clone().add(0, -i, 0);
+				if (isCollision(location)) {
+					return true;
+				}
+			}
+
+			return false;
+		}
+	}
+
+	private class RelaxedCollisionDetector extends AbstractCollisionDetector {
+		@Override
+		public boolean isColliding(Player player) {
+			// The location in front of the player, where the player will be in one second.
+			Location front = player.getEyeLocation().clone().subtract(0.0, 0.5, 0.0);
+			front.setPitch(0);
+
+			Vector direction = front.getDirection().clone().setY(0).normalize();
+			double playerSpeed = player.getVelocity().clone().setY(0).length();
+
+			front.add(direction.clone().multiply(Math.max(speed, playerSpeed)));
+
+			return isCollision(front);
+		}
+	}
+
+	private static class DoubleSmoother {
+		private double[] values;
+		private int size;
+		private int index;
+
+		public DoubleSmoother(int size) {
+			this.size = size;
+			this.index = 0;
+
+			values = new double[size];
+		}
+
+		public double add(double value) {
+			values[index] = value;
+			index = (index + 1) % size;
+			return get();
+		}
+
+		public double get() {
+			return Arrays.stream(this.values).sum() / this.size;
+		}
 	}
 }

@@ -1,6 +1,7 @@
 package com.jedk1.jedcore.ability.waterbending.combo;
 
 import com.jedk1.jedcore.JedCore;
+import com.jedk1.jedcore.util.MaterialUtil;
 import com.jedk1.jedcore.util.RegenTempBlock;
 import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
@@ -16,6 +17,8 @@ import com.projectkorra.projectkorra.util.TempBlock;
 import com.projectkorra.projectkorra.waterbending.WaterManipulation;
 import com.projectkorra.projectkorra.waterbending.WaterSpout;
 
+import com.projectkorra.projectkorra.waterbending.plant.PlantRegrowth;
+import com.projectkorra.projectkorra.waterbending.util.WaterReturn;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -49,6 +52,8 @@ public class WaterFlow extends WaterAbility implements AddonAbility, ComboAbilit
 	private int fullmoonSizeSmall; //2;
 	private int fullmoonSizeLarge; //3;
 	private long avatarDuration; //60000;
+	private boolean canUseBottle;
+	private boolean canUsePlants;
 	
 	private long time;
 	private Location origin;
@@ -59,6 +64,7 @@ public class WaterFlow extends WaterAbility implements AddonAbility, ComboAbilit
 	private boolean frozen;
 	private double initHealth;
 	private int headsize;
+	private boolean usingBottle;
 	private ConcurrentHashMap<Block, Location> directions = new ConcurrentHashMap<Block, Location>();
 	private List<Block> blocks = new ArrayList<Block>();
 	private List<Block> sources = new ArrayList<Block>();
@@ -79,6 +85,9 @@ public class WaterFlow extends WaterAbility implements AddonAbility, ComboAbilit
 		}
 
 		setFields();
+
+		usingBottle = false;
+
 		if (prepare()) {
 			headsize = size;
 			trail = trail * size;
@@ -131,6 +140,8 @@ public class WaterFlow extends WaterAbility implements AddonAbility, ComboAbilit
 		avatarDuration = JedCore.plugin.getConfig().getLong("Abilities.Water.WaterCombo.WaterFlow.AvatarStateDuration");
 		stayatsource = JedCore.plugin.getConfig().getBoolean("Abilities.Water.WaterCombo.WaterFlow.PlayerStayNearSource");
 		stayrange = JedCore.plugin.getConfig().getInt("Abilities.Water.WaterCombo.WaterFlow.MaxDistanceFromSource");
+		canUseBottle = JedCore.plugin.getConfig().getBoolean("Abilities.Water.WaterCombo.WaterFlow.BottleSource");
+		canUsePlants = JedCore.plugin.getConfig().getBoolean("Abilities.Water.WaterCombo.WaterFlow.PlantSource");
 		fullmoonCooldown = JedCore.plugin.getConfig().getInt("Abilities.Water.WaterCombo.WaterFlow.FullMoon.Modifier.Cooldown");
 		fullmoonDuration = JedCore.plugin.getConfig().getInt("Abilities.Water.WaterCombo.WaterFlow.FullMoon.Modifier.Duration");
 		fullmoonEnabled = JedCore.plugin.getConfig().getBoolean("Abilities.Water.WaterCombo.WaterFlow.FullMoon.Enabled");
@@ -161,11 +172,29 @@ public class WaterFlow extends WaterAbility implements AddonAbility, ComboAbilit
 	}
 
 	private boolean prepare() {
-		sourceblock = BlockSource.getWaterSourceBlock(player, sourcerange, ClickType.SHIFT_DOWN, true, bPlayer.canIcebend(), false);
+		sourceblock = BlockSource.getWaterSourceBlock(player, sourcerange, ClickType.SHIFT_DOWN, true, bPlayer.canIcebend(), canUsePlants);
 		if (sourceblock != null) {
-			if (GeneralMethods.isAdjacentToThreeOrMoreSources(sourceblock)) {
-				head = sourceblock.getLocation();
-				origin = sourceblock.getLocation();
+			boolean isGoodSource = GeneralMethods.isAdjacentToThreeOrMoreSources(sourceblock) || (TempBlock.isTempBlock(sourceblock) && WaterAbility.isBendableWaterTempBlock(sourceblock));
+
+			if (isGoodSource || isPlant(sourceblock)) {
+				head = sourceblock.getLocation().clone();
+				origin = sourceblock.getLocation().clone();
+				if (isPlant(sourceblock)) {
+					new PlantRegrowth(player, sourceblock);
+				}
+				return true;
+			}
+		}
+
+		if (canUseBottle && WaterReturn.hasWaterBottle(player)){
+			Location eye = player.getEyeLocation();
+			Location forward = eye.clone().add(eye.getDirection());
+
+			if (isTransparent(eye.getBlock()) && isTransparent(forward.getBlock())) {
+				head = forward.clone();
+				origin = forward.clone();
+				usingBottle = true;
+				WaterReturn.emptyWaterBottle(player);
 				return true;
 			}
 		}
@@ -243,7 +272,7 @@ public class WaterFlow extends WaterAbility implements AddonAbility, ComboAbilit
 				entity.setFallDistance(0f);
 			}
 
-			if (!isTransparent(block) || GeneralMethods.isRegionProtectedFromBuild(player, "Torrent", block.getLocation())) {
+			if (!MaterialUtil.isTransparent(block) || GeneralMethods.isRegionProtectedFromBuild(player, "Torrent", block.getLocation())) {
 				blocks.remove(block);
 				directions.remove(block);
 				if (TempBlock.isTempBlock(block)) {
@@ -274,7 +303,7 @@ public class WaterFlow extends WaterAbility implements AddonAbility, ComboAbilit
 	}
 
 	private void moveWater() {
-		if (!isTransparent(head.getBlock()) || GeneralMethods.isRegionProtectedFromBuild(player, "Torrent", head)) {
+		if (!MaterialUtil.isTransparent(head.getBlock()) || GeneralMethods.isRegionProtectedFromBuild(player, "Torrent", head)) {
 			range -= 2;
 		}
 		direction = GeneralMethods.getDirection(head, GeneralMethods.getTargetedLocation(player, range, new Integer[] { 8, 9 })).normalize();
@@ -333,6 +362,10 @@ public class WaterFlow extends WaterAbility implements AddonAbility, ComboAbilit
 		}
 		if (!frozen) {
 			removeBlocks();
+		}
+
+		if (usingBottle) {
+			new WaterReturn(player, head.getBlock());
 		}
 		super.remove();
 	}

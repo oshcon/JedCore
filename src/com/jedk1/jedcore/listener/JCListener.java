@@ -21,6 +21,8 @@ import com.jedk1.jedcore.util.UpdateChecker;
 import com.projectkorra.projectkorra.ProjectKorra;
 import com.projectkorra.projectkorra.ability.CoreAbility;
 import com.projectkorra.projectkorra.ability.IceAbility;
+import com.projectkorra.projectkorra.earthbending.lava.LavaFlow;
+import com.projectkorra.projectkorra.event.AbilityStartEvent;
 import com.projectkorra.projectkorra.event.BendingReloadEvent;
 import com.projectkorra.projectkorra.event.HorizontalVelocityChangeEvent;
 import com.projectkorra.projectkorra.event.PlayerCooldownChangeEvent;
@@ -67,6 +69,24 @@ public class JCListener implements Listener {
 		if (UpdateChecker.hasUpdate() && JedCore.plugin.getConfig().getBoolean("Settings.Updater.Notify")) {
 			if (event.getPlayer().hasPermission("jedcore.admin.notify")) {
 				event.getPlayer().sendMessage(ChatColor.DARK_RED + "JedCore: " + ChatColor.RED + "There is an update available for JedCore!");
+			}
+		}
+	}
+
+	@EventHandler
+	public void onAbilityStart(AbilityStartEvent event) {
+		if (event.isCancelled()) return;
+
+		if (event.getAbility() instanceof LavaFlow) {
+			Player player = event.getAbility().getPlayer();
+			MagmaBlast mb = CoreAbility.getAbility(player, MagmaBlast.class);
+
+			if (mb != null && (mb.hasBlocks() || mb.shouldBlockLavaFlow())) {
+				event.setCancelled(true);
+				LavaFlow flow = (LavaFlow) event.getAbility();
+
+				// Reset the cooldown of LavaFlow that was set before the call to start().
+				flow.getBendingPlayer().removeCooldown(flow);
 			}
 		}
 	}
@@ -196,6 +216,14 @@ public class JCListener implements Listener {
 	@EventHandler(priority = EventPriority.NORMAL)
 	public void onCooldownChange(PlayerCooldownChangeEvent event) {
 		if (event.getPlayer() == null) return;
+		if (event.getAbility() != null) {
+			// Fix a bug in ProjectKorra 1.8.4 that keeps IceWave around forever.
+			// It will continuously add a cooldown to WaterWave, which makes this spam tasks / scoreboard updates.
+			if (event.getAbility().equals("WaterWave")) {
+				return;
+			}
+		}
+
 		BendingBoard.update(event.getPlayer());
 	}
 	

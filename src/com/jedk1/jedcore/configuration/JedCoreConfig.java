@@ -161,6 +161,7 @@ public class JedCoreConfig {
 		config.addDefault("Abilities.Air.AirGlide.AllowAirSpout", false);
 		config.addDefault("Abilities.Air.AirGlide.Cooldown", 0);
 		config.addDefault("Abilities.Air.AirGlide.Duration", 0);
+		config.addDefault("Abilities.Air.AirGlide.RequireGround", false);
 		
 		config.addDefault("Abilities.Air.AirPunch.Enabled", true);
 		config.addDefault("Abilities.Air.AirPunch.Description", "Left-Click in rapid succession to punch high desnity packets of air "
@@ -275,10 +276,15 @@ public class JedCoreConfig {
 				+ "the ground, and Left Click! Additionally, if an entity just so happens to get caught in "
 				+ "the wave, they will be moved with the wave.");
 		config.addDefault("Abilities.Earth.EarthSurf.Cooldown.Cooldown", 3000);
+		config.addDefault("Abilities.Earth.EarthSurf.Cooldown.MinimumCooldown", 2000);
+		config.addDefault("Abilities.Earth.EarthSurf.Cooldown.Scaled", true);
 		config.addDefault("Abilities.Earth.EarthSurf.Cooldown.Enabled", false);
 		config.addDefault("Abilities.Earth.EarthSurf.Duration.Duration", 7000);
 		config.addDefault("Abilities.Earth.EarthSurf.Duration.Enabled", false);
+		config.addDefault("Abilities.Earth.EarthSurf.RelaxedCollisions", true);
 		config.addDefault("Abilities.Earth.EarthSurf.Speed", 0.55);
+		config.addDefault("Abilities.Earth.EarthSurf.HeightTolerance", 3);
+		config.addDefault("Abilities.Earth.EarthSurf.SpringStiffness", 0.35);
 		
 		config.addDefault("Abilities.Earth.Fissure.Enabled", true);
 		config.addDefault("Abilities.Earth.Fissure.Description", "Fissure is an advanced Lavabending "
@@ -338,7 +344,7 @@ public class JedCoreConfig {
 		config.addDefault("Abilities.Earth.LavaThrow.SourceGrabRange", 4);
 		config.addDefault("Abilities.Earth.LavaThrow.SourceRegenDelay", 10000);
 		config.addDefault("Abilities.Earth.LavaThrow.FireTicks", 80);
-		
+
 		config.addDefault("Abilities.Earth.MagnetShield.Enabled", true);
 		config.addDefault("Abilities.Earth.MagnetShield.Description", "Repel any metal projectiles using a strong magnetic shield. "
 				+ "To activate, simply hold sneak with this ability bound.");
@@ -423,11 +429,18 @@ public class JedCoreConfig {
 		config.addDefault("Abilities.Earth.EarthCombo.MagmaBlast.Enabled", true);
 		config.addDefault("Abilities.Earth.EarthCombo.MagmaBlast.Description", "Fire balls of magma at your enemy!");
 		config.addDefault("Abilities.Earth.EarthCombo.MagmaBlast.MaxShots", 3);
-		config.addDefault("Abilities.Earth.EarthCombo.MagmaBlast.ImpactDamage", 5.0);
-		config.addDefault("Abilities.Earth.EarthCombo.MagmaBlast.TravelRange", 10);
+		config.addDefault("Abilities.Earth.EarthCombo.MagmaBlast.ImpactDamage", 2.0);
 		config.addDefault("Abilities.Earth.EarthCombo.MagmaBlast.SearchRange", 4);
-		config.addDefault("Abilities.Earth.EarthCombo.MagmaBlast.Cooldown", 8000);
+		config.addDefault("Abilities.Earth.EarthCombo.MagmaBlast.Cooldown", 6000);
 		config.addDefault("Abilities.Earth.EarthCombo.MagmaBlast.ShotCooldown", 1500);
+		config.addDefault("Abilities.Earth.EarthCombo.MagmaBlast.RequireLavaFlow", false);
+		config.addDefault("Abilities.Earth.EarthCombo.MagmaBlast.PlayerCollisions", true);
+		config.addDefault("Abilities.Earth.EarthCombo.MagmaBlast.EntitySelection", true);
+		config.addDefault("Abilities.Earth.EarthCombo.MagmaBlast.SelectRange", 30.0);
+		config.addDefault("Abilities.Earth.EarthCombo.MagmaBlast.ExplosionRadius", 2.0);
+		config.addDefault("Abilities.Earth.EarthCombo.MagmaBlast.FireSpeed", 1.5);
+		config.addDefault("Abilities.Earth.EarthCombo.MagmaBlast.MaxDuration", 15000);
+		config.addDefault("Abilities.Earth.EarthCombo.MagmaBlast.MaxDistanceFromSources", 15);
 		
 		config.addDefault("Abilities.Fire.Combustion.Enabled", true);
 		config.addDefault("Abilities.Fire.Combustion.Description", "Hold Shift to focus large amounts of energy into your body, "
@@ -708,6 +721,8 @@ public class JedCoreConfig {
 		config.addDefault("Abilities.Water.WaterCombo.WaterFlow.MaxRange", 40);
 		config.addDefault("Abilities.Water.WaterCombo.WaterFlow.MinRange", 8);
 		config.addDefault("Abilities.Water.WaterCombo.WaterFlow.Trail", 80);
+		config.addDefault("Abilities.Water.WaterCombo.WaterFlow.BottleSource", false);
+		config.addDefault("Abilities.Water.WaterCombo.WaterFlow.PlantSource", false);
 		config.addDefault("Abilities.Water.WaterCombo.WaterFlow.Size.Normal", 1);
 		config.addDefault("Abilities.Water.WaterCombo.WaterFlow.Size.AvatarState", 3);
 		config.addDefault("Abilities.Water.WaterCombo.WaterFlow.Size.FullmoonSmall", 2);
@@ -732,6 +747,8 @@ public class JedCoreConfig {
 		config.addDefault("Abilities.Water.WaterCombo.WaterGimbal.Speed", 2);
 		config.addDefault("Abilities.Water.WaterCombo.WaterGimbal.AnimationSpeed", 3);
 		config.addDefault("Abilities.Water.WaterCombo.WaterGimbal.PlantSource", true);
+		config.addDefault("Abilities.Water.WaterCombo.WaterGimbal.RequireAdjacentPlants", true);
+		config.addDefault("Abilities.Water.WaterCombo.WaterGimbal.BottleSource", false);
 		
 		config.addDefault("Abilities.Water.Ice.Passive.Skate.Enabled", true);
 		config.addDefault("Abilities.Water.Ice.Passive.Skate.SpeedFactor", 4);
