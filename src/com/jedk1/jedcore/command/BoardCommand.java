@@ -2,7 +2,6 @@ package com.jedk1.jedcore.command;
 
 import com.jedk1.jedcore.scoreboard.BendingBoard;
 import com.projectkorra.projectkorra.command.PKCommand;
-
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 

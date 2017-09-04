@@ -1,7 +1,6 @@
 package com.jedk1.jedcore.util;
 
 import com.projectkorra.projectkorra.ability.Ability;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.FallingBlock;

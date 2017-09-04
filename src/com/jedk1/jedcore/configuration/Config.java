@@ -1,7 +1,6 @@
 package com.jedk1.jedcore.configuration;
 
 import com.jedk1.jedcore.JedCore;
-
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 

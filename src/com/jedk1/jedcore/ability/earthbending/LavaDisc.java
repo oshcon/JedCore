@@ -1,8 +1,16 @@
 package com.jedk1.jedcore.ability.earthbending;
 
-import java.util.List;
-
+import com.jedk1.jedcore.JCMethods;
+import com.jedk1.jedcore.JedCore;
+import com.jedk1.jedcore.util.RegenTempBlock;
+import com.projectkorra.projectkorra.GeneralMethods;
+import com.projectkorra.projectkorra.ability.AddonAbility;
+import com.projectkorra.projectkorra.ability.LavaAbility;
 import com.projectkorra.projectkorra.earthbending.passive.EarthPassive;
+import com.projectkorra.projectkorra.firebending.util.FireDamageTimer;
+import com.projectkorra.projectkorra.util.DamageHandler;
+import com.projectkorra.projectkorra.util.ParticleEffect;
+import com.projectkorra.projectkorra.util.TempBlock;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -11,16 +19,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import com.jedk1.jedcore.JCMethods;
-import com.jedk1.jedcore.JedCore;
-import com.jedk1.jedcore.util.RegenTempBlock;
-import com.projectkorra.projectkorra.GeneralMethods;
-import com.projectkorra.projectkorra.ability.AddonAbility;
-import com.projectkorra.projectkorra.ability.LavaAbility;
-import com.projectkorra.projectkorra.firebending.util.FireDamageTimer;
-import com.projectkorra.projectkorra.util.DamageHandler;
-import com.projectkorra.projectkorra.util.ParticleEffect;
-import com.projectkorra.projectkorra.util.TempBlock;
+import java.util.List;
 
 public class LavaDisc extends LavaAbility implements AddonAbility {
 

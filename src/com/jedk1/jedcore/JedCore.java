@@ -1,20 +1,19 @@
 package com.jedk1.jedcore;
 
-import java.io.IOException;
-import java.util.logging.*;
-
 import com.google.common.reflect.ClassPath;
-import com.jedk1.jedcore.util.*;
-import org.bukkit.plugin.java.JavaPlugin;
-
 import com.jedk1.jedcore.command.Commands;
 import com.jedk1.jedcore.configuration.JedCoreConfig;
 import com.jedk1.jedcore.listener.AbilityListener;
 import com.jedk1.jedcore.listener.CommandListener;
 import com.jedk1.jedcore.listener.JCListener;
 import com.jedk1.jedcore.scoreboard.BendingBoard;
+import com.jedk1.jedcore.util.*;
 import com.projectkorra.projectkorra.ability.CoreAbility;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import java.io.IOException;
+import java.util.logging.Logger;
 
 public class JedCore extends JavaPlugin {
 

@@ -9,10 +9,7 @@ import com.projectkorra.projectkorra.firebending.FireBlastCharged;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-
-import static java.util.stream.Collectors.toList;
 
 public class CollisionInitializer<T extends CoreAbility> {
     private static Map<String, CoreAbility> specialAbilities = new HashMap<>();

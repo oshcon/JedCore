@@ -9,7 +9,6 @@ import com.projectkorra.projectkorra.ability.HealingAbility;
 import com.projectkorra.projectkorra.chiblocking.Smokescreen;
 import com.projectkorra.projectkorra.util.ParticleEffect;
 import com.projectkorra.projectkorra.util.TempBlock;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Server;

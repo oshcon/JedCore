@@ -2,16 +2,14 @@ package com.jedk1.jedcore.util;
 
 import com.projectkorra.projectkorra.earthbending.passive.EarthPassive;
 import com.projectkorra.projectkorra.util.TempBlock;
-
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.Container;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class RegenTempBlock {
 
@@ -46,6 +44,10 @@ public class RegenTempBlock {
 	public RegenTempBlock(Block block, Material material, byte data, long delay, boolean temp, RegenCallback callback) {
 		if (EarthPassive.isPassiveSand(block)) {
 			EarthPassive.revertSand(block);
+		}
+		// Temporary? fix for an item duplication glitch involving containers.
+		if (block.getState() instanceof Container) {
+			return;
 		}
 		if (blocks.containsKey(block)) {
 			blocks.replace(block, new RegenBlockData(System.currentTimeMillis() + delay, callback));

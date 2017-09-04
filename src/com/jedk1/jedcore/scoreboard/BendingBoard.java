@@ -1,16 +1,5 @@
 package com.jedk1.jedcore.scoreboard;
 
-import java.io.File;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-
-import com.projectkorra.projectkorra.Element;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
-
 import com.jedk1.jedcore.JCMethods;
 import com.jedk1.jedcore.JedCore;
 import com.jedk1.jedcore.configuration.Config;
@@ -18,6 +7,15 @@ import com.jedk1.jedcore.configuration.JedCoreConfig;
 import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.ability.CoreAbility;
 import com.projectkorra.projectkorra.ability.util.MultiAbilityManager;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+
+import java.io.File;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class BendingBoard {
 
@@ -152,7 +150,7 @@ public class BendingBoard {
 	}
 	
 	public static boolean isDisabled(Player player) {
-		return disabled.contains(player.getUniqueId());
+		return !(get(player) == null || disabled.contains(player.getUniqueId()));
 	}
 	
 	public void remove() {

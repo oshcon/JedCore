@@ -6,7 +6,6 @@ import com.jedk1.jedcore.event.PKCommandEvent.CommandType;
 import com.jedk1.jedcore.scoreboard.BendingBoard;
 import com.jedk1.jedcore.util.UpdateChecker;
 import com.projectkorra.projectkorra.command.PKCommand;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;

@@ -11,7 +11,6 @@ import com.projectkorra.projectkorra.earthbending.passive.EarthPassive;
 import com.projectkorra.projectkorra.util.BlockSource;
 import com.projectkorra.projectkorra.util.ClickType;
 import com.projectkorra.projectkorra.util.DamageHandler;
-
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;

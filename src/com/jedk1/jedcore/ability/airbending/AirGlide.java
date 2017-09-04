@@ -5,7 +5,6 @@ import com.jedk1.jedcore.collision.CollisionDetector;
 import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.AirAbility;
 import com.projectkorra.projectkorra.airbending.AirSpout;
-
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;

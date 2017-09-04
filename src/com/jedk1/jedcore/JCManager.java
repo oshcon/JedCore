@@ -1,14 +1,12 @@
  package com.jedk1.jedcore;
 
-import com.jedk1.jedcore.ability.firebending.FirePunch;
-import com.jedk1.jedcore.ability.firebending.FireShots;
-import com.jedk1.jedcore.ability.firebending.LightningBurst;
-import com.jedk1.jedcore.ability.waterbending.HealingWaters;
-import com.jedk1.jedcore.ability.waterbending.IcePassive;
-import com.jedk1.jedcore.util.RegenTempBlock;
-import com.jedk1.jedcore.util.TempFallingBlock;
-
-import org.bukkit.Bukkit;
+ import com.jedk1.jedcore.ability.firebending.FirePunch;
+ import com.jedk1.jedcore.ability.firebending.LightningBurst;
+ import com.jedk1.jedcore.ability.waterbending.HealingWaters;
+ import com.jedk1.jedcore.ability.waterbending.IcePassive;
+ import com.jedk1.jedcore.util.RegenTempBlock;
+ import com.jedk1.jedcore.util.TempFallingBlock;
+ import org.bukkit.Bukkit;
 
 public class JCManager implements Runnable {
 

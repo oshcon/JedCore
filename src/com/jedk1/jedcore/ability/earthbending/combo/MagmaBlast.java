@@ -1,24 +1,22 @@
 package com.jedk1.jedcore.ability.earthbending.combo;
 
+import com.jedk1.jedcore.JedCore;
 import com.jedk1.jedcore.collision.AABB;
 import com.jedk1.jedcore.util.MaterialUtil;
-import com.jedk1.jedcore.util.VersionUtil;
-import com.projectkorra.projectkorra.ability.ElementalAbility;
-import com.projectkorra.projectkorra.earthbending.lava.LavaFlow;
-import io.netty.util.internal.ConcurrentSet;
-
-import com.jedk1.jedcore.JedCore;
 import com.jedk1.jedcore.util.TempFallingBlock;
+import com.jedk1.jedcore.util.VersionUtil;
 import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.ComboAbility;
+import com.projectkorra.projectkorra.ability.ElementalAbility;
 import com.projectkorra.projectkorra.ability.LavaAbility;
 import com.projectkorra.projectkorra.ability.util.ComboManager.AbilityInformation;
+import com.projectkorra.projectkorra.earthbending.lava.LavaFlow;
 import com.projectkorra.projectkorra.util.ClickType;
 import com.projectkorra.projectkorra.util.DamageHandler;
 import com.projectkorra.projectkorra.util.ParticleEffect;
 import com.projectkorra.projectkorra.util.TempBlock;
-
+import io.netty.util.internal.ConcurrentSet;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;

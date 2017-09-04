@@ -1,27 +1,7 @@
 package com.jedk1.jedcore.ability.waterbending;
 
-import java.util.*;
-
-import com.jedk1.jedcore.util.VersionUtil;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Blaze;
-import org.bukkit.entity.Creature;
-import org.bukkit.entity.Creeper;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Fireball;
-import org.bukkit.entity.Ghast;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Skeleton;
-import org.bukkit.entity.ThrownPotion;
-import org.bukkit.entity.Witch;
-import org.bukkit.potion.Potion;
-import org.bukkit.potion.PotionType;
-import org.bukkit.util.Vector;
-
 import com.jedk1.jedcore.JedCore;
+import com.jedk1.jedcore.util.VersionUtil;
 import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
@@ -29,6 +9,17 @@ import com.projectkorra.projectkorra.ability.AirAbility;
 import com.projectkorra.projectkorra.ability.BloodAbility;
 import com.projectkorra.projectkorra.command.Commands;
 import com.projectkorra.projectkorra.util.DamageHandler;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.entity.*;
+import org.bukkit.potion.Potion;
+import org.bukkit.potion.PotionType;
+import org.bukkit.util.Vector;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
 
 @SuppressWarnings("deprecation")
 public class BloodPuppet extends BloodAbility implements AddonAbility {
