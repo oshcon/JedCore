@@ -58,6 +58,9 @@ public class MetalFragments extends MetalAbility implements AddonAbility {
 
 		if (prepare()) {
 			Block b = selectSource();
+                        if (GeneralMethods.isRegionProtectedFromBuild(player, "MetalFragments", b.getLocation())) {
+                            return;
+			}
 			translateUpward(b);
 
 			start();
